@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">StoryApp</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="caption_login">Login</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="caption_register">Register</string>
+    <string name="hint_name">Name</string>
+    <string name="caption_loading">Loading ...</string>
+    <string name="caption_story_list">Dicoding Stories</string>
+    <string name="caption_logout">Logout</string>
+    <string name="caption_add_story_button">add story button</string>
+    <string name="caption_gallery">Gallery</string>
+    <string name="caption_upload">Upload</string>
+    <string name="caption_camera">Camera</string>
+    <string name="caption_description">Description</string>
+</resources>
