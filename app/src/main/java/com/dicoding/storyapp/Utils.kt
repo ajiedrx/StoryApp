@@ -7,6 +7,9 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Environment
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -101,3 +104,6 @@ fun formatSize(size: Long): String? {
     if (suffix != null) resultBuffer.append(suffix)
     return resultBuffer.toString()
 }
+
+fun ViewModel.getViewModelScope(coroutineScope: CoroutineScope?) =
+    coroutineScope ?: this.viewModelScope

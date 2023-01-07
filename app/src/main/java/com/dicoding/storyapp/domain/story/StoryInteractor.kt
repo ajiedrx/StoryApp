@@ -1,5 +1,7 @@
 package com.dicoding.storyapp.domain.story
 
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.dicoding.storyapp.base.BaseResponse
 import com.dicoding.storyapp.data.story.StoryRepository
 import kotlinx.coroutines.flow.Flow
@@ -8,8 +10,12 @@ import java.io.File
 
 class StoryInteractor(private val repository: StoryRepository):
     StoryUseCase {
-    override suspend fun getAllStories(): Flow<List<Story>> {
-        return repository.getAllStories().mapNotNull { it.listStory?.mapNotNull { it?.toDomain() } }
+    override suspend fun getAllStories(isRetrieveLocation: Boolean): Flow<List<Story>> {
+        return repository.getAllStories(isRetrieveLocation).mapNotNull { it.listStory?.mapNotNull { it?.toDomain() } }
+    }
+
+    override fun getAllStories(): Flow<PagingData<Story>> {
+        return repository.getAllStories().mapNotNull { it.map { it.toDomain() } }
     }
 
     override suspend fun getStoryDetail(id: String): Flow<Story> {

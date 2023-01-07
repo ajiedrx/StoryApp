@@ -22,4 +22,6 @@
     <string name="caption_upload">Upload</string>
     <string name="caption_camera">Camera</string>
     <string name="caption_description">Description</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="caption_retry">retry</string>
 </resources>

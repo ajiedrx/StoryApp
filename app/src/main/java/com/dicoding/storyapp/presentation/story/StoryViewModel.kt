@@ -1,26 +1,37 @@
 package com.dicoding.storyapp.presentation.story
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.dicoding.storyapp.base.BaseResponse
 import com.dicoding.storyapp.base.BaseResult
 import com.dicoding.storyapp.domain.story.Story
 import com.dicoding.storyapp.domain.story.StoryUseCase
-import id.zelory.compressor.Compressor
-import id.zelory.compressor.constraint.quality
-import id.zelory.compressor.constraint.size
+import com.dicoding.storyapp.getViewModelScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.io.File
 
-class StoryViewModel(private val storyUseCase: StoryUseCase, private val context: Context) : ViewModel() {
+class StoryViewModel(private val storyUseCase: StoryUseCase, coroutineScopeProvider: CoroutineScope? = null) : ViewModel() {
+
+    private val coroutineScope: CoroutineScope
+
+    init {
+        coroutineScope = getViewModelScope(coroutineScopeProvider)
+    }
+
 
     private var _getAllStories: MutableLiveData<BaseResult<List<Story>>> = MutableLiveData<BaseResult<List<Story>>>()
     val getAllStories: LiveData<BaseResult<List<Story>>> by lazy { _getAllStories }
+
+//    private var _getAllStoriesPaging: MutableLiveData<PagingData<Story>> = MutableLiveData<PagingData<Story>>()
+//    val getAllStoriesPaging: LiveData<PagingData<Story>> by lazy { _getAllStoriesPaging }
 
     private var _getStoryDetail: MutableLiveData<BaseResult<Story>> = MutableLiveData< BaseResult<Story>>()
     val getStoryDetail: LiveData<BaseResult<Story>> by lazy { _getStoryDetail }
@@ -28,10 +39,10 @@ class StoryViewModel(private val storyUseCase: StoryUseCase, private val context
     private var _uploadStory: MutableLiveData<BaseResult<BaseResponse>> = MutableLiveData<BaseResult<BaseResponse>>()
     val uploadStory: LiveData<BaseResult<BaseResponse>> by lazy { _uploadStory }
 
-    fun getAllStories(){
+    fun getAllStories(isRetrieveLocation: Boolean){
         viewModelScope.launch {
             storyUseCase
-                .getAllStories()
+                .getAllStories(isRetrieveLocation)
                 .onStart {
                     _getAllStories.value = BaseResult.Loading
                 }
@@ -42,6 +53,27 @@ class StoryViewModel(private val storyUseCase: StoryUseCase, private val context
                     _getAllStories.value = BaseResult.Success(it)
                 }
         }
+    }
+
+//    val storyListPaging: LiveData<PagingData<Story>> =
+//        storyUseCase.getAllStories().cachedIn(viewModelScope).asLiveData()
+
+    fun getAllStoriesPaging(): LiveData<PagingData<Story>> {
+        return storyUseCase.getAllStories().cachedIn(coroutineScope).asLiveData()
+//        coroutineScope.launch {
+//            storyUseCase
+//                .getAllStories()
+//                .cachedIn(coroutineScope)
+//                .onStart {
+//                    _getAllStoriesPaging.value = BaseResult.Loading
+//                }
+//                .catch {
+//                    _getAllStoriesPaging.value = BaseResult.Error(it.message.orEmpty())
+//                }
+//                .collect {
+//                    _getAllStoriesPaging.value = BaseResult.Success(it)
+//                }
+//        }
     }
 
     fun getStoryDetail(id: String){
@@ -64,18 +96,9 @@ class StoryViewModel(private val storyUseCase: StoryUseCase, private val context
 
     fun postStory(description: String, photoFile: File){
         viewModelScope.launch {
-            val finalFile = if(photoFile.length() / 1024 > 1000){
-                Compressor
-                    .compress(context,photoFile){
-                        quality(80)
-                        size(maxFileSize = 1_048_576)
-                    }
-            } else {
-                photoFile
-            }
             storyUseCase
                 .postStory(
-                    description, finalFile
+                    description, photoFile
                 )
                 .onStart {
                     _uploadStory.value = BaseResult.Loading

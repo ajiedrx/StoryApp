@@ -1,5 +1,8 @@
 package com.dicoding.storyapp.data.story
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.dicoding.storyapp.base.BaseResponse
 import com.dicoding.storyapp.data.network.handleApiError
 import com.dicoding.storyapp.data.story.model.GetStoryDetailResponse
@@ -13,10 +16,21 @@ import okhttp3.RequestBody
 import java.io.File
 
 class StoryDataStore(private val storyApiService: StoryApiService): StoryRepository {
-    override suspend fun getAllStories(): Flow<GetStoryListResponse> {
+    override suspend fun getAllStories(isRetrieveLocation: Boolean): Flow<GetStoryListResponse> {
         return flow {
-            emit(storyApiService.getAllStories().handleApiError())
+            emit(storyApiService.getAllStories(if(isRetrieveLocation) 1 else 0).handleApiError())
         }
+    }
+
+    override fun getAllStories(): Flow<PagingData<GetStoryListResponse.Story>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 5
+            ),
+            pagingSourceFactory = {
+                StoryPagingSource(storyApiService)
+            }
+        ).flow
     }
 
     override suspend fun getStoryDetail(id: String): Flow<GetStoryDetailResponse> {

@@ -3,6 +3,8 @@ package com.dicoding.storyapp.di
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import com.chuckerteam.chucker.api.ChuckerCollector
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.dicoding.storyapp.const.Const
 import com.dicoding.storyapp.data.auth.AuthApiService
 import com.dicoding.storyapp.data.auth.AuthDataStore
@@ -32,6 +34,13 @@ val networkModule = module {
     single {
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(getHeaderInterceptor(get()))
+            .addInterceptor(
+                ChuckerInterceptor.Builder(get())
+                .collector(ChuckerCollector(get()))
+                .maxContentLength(250000L)
+                .redactHeaders(emptySet())
+                .alwaysReadResponseBody(false)
+                .build())
             .build()
 
         val client = Retrofit.Builder()
@@ -72,7 +81,7 @@ val storyModule = module {
     single { ApiService.createReactiveService(StoryApiService::class.java, get()) }
     single<StoryRepository> { StoryDataStore(get()) }
     single<StoryUseCase> { StoryInteractor(get()) }
-    viewModel { StoryViewModel(get(), get()) }
+    viewModel { StoryViewModel(get()) }
 }
 
 

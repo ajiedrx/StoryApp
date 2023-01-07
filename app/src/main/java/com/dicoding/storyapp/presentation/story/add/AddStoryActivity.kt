@@ -12,12 +12,17 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.dicoding.storyapp.base.BaseActivity
 import com.dicoding.storyapp.base.BaseResult
 import com.dicoding.storyapp.databinding.ActivityAddStoryBinding
 import com.dicoding.storyapp.presentation.story.StoryViewModel
 import com.dicoding.storyapp.rotateBitmap
 import com.dicoding.storyapp.uriToFile
+import id.zelory.compressor.Compressor
+import id.zelory.compressor.constraint.quality
+import id.zelory.compressor.constraint.size
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
@@ -67,7 +72,18 @@ class AddStoryActivity : BaseActivity() {
                 } else if(edAddDescription.text.toString().isEmpty()){
                     Toast.makeText(this@AddStoryActivity, "Silahkan tambahkan deskripsi terlebih dahulu", Toast.LENGTH_LONG).show()
                 } else {
-                    storyViewModel.postStory(edAddDescription.text.toString(), photoFile!!)
+                    lifecycleScope.launch {
+                        val finalFile = if(photoFile!!.length() / 1024 > 1000){
+                            Compressor
+                                .compress(this@AddStoryActivity,photoFile!!){
+                                    quality(80)
+                                    size(maxFileSize = 1_048_576)
+                                }
+                        } else {
+                            photoFile
+                        }
+                        storyViewModel.postStory(edAddDescription.text.toString(), finalFile!!)
+                    }
                 }
             }
         }

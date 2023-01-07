@@ -19,6 +19,20 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
+        android:id="@+id/btn_maps"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/transparent"
+        android:textColor="@color/dicoding_primary"
+        android:textAllCaps="false"
+        android:src="@drawable/ic_baseline_map_24"
+        app:layout_constraintEnd_toStartOf="@id/btn_logout"
+        app:layout_constraintTop_toTopOf="@id/tv_title"
+        app:layout_constraintBottom_toBottomOf="@id/tv_title">
+    </ImageButton>
+
+    <ImageButton
         android:id="@+id/btn_logout"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
